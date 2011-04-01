@@ -1,0 +1,17 @@
+You need fabric (fabfile.org) installed to make this work.
+
+To start/stop the masters, run:
+$ fab masters {start|stop}
+
+To start/stop the slaves, run:
+$ fab slaves {start|stop}
+
+The masters file and the slaves file now can use any of the following formats:
+
+# Comment
+host1
+user@host2
+user2@host3:port
+user3@hosts4 -p port
+
+Also, on all the machines the HADOOP_HOME should be ~/hadoop.
