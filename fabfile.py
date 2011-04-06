@@ -8,6 +8,7 @@ env.shell = "/usr/bin/env bash -c"
 
 HADOOP_HOME = ''
 HADOOP_CONF_DIR = ''
+TARGET=''
 
 def hadoop_config(hosts=''):
     global HADOOP_HOME 
@@ -35,12 +36,16 @@ def parse_hosts(hostfile):
 #    HADOOP_JOBTRACKER_OPTS="-Dcom.sun.management.jmxremote $HADOOP_JOBTRACKER_OPTS"
 
 def masters():
+    global TARGET
     hadoop_config()
     env.hosts = parse_hosts('masters')
+    TARGET = 'masters'
 
 def slaves():
+    global TARGET
     hadoop_config()
     env.hosts = parse_hosts('slaves')
+    TARGET = 'slaves'
 
 def slaves_do(command):
     run("cd "+HADOOP_HOME+"; ./bin/hadoop-daemon.sh --config "+HADOOP_CONF_DIR+" "+command)
@@ -58,23 +63,23 @@ def start():
     tasktracker('start')
     
 def jobtracker(action):
-    if env.hosts != parse_hosts('masters'):
+    if TARGET != 'masters':
         return
     local(HADOOP_HOME+'/bin/hadoop-daemon.sh --config ' +HADOOP_CONF_DIR+ ' ' + action + ' jobtracker', capture=False)
 
 def tasktracker(action):
-    if env.hosts != parse_hosts('slaves'):
+    if TARGET != 'slaves':
         return
     hadoop_daemons(action + ' tasktracker')
 
 def namenode(action):
-    if env.hosts != parse_hosts('masters'):
+    if TARGET != 'masters':
         return
     local(HADOOP_HOME+'/bin/hadoop-daemon.sh --config '+HADOOP_CONF_DIR+ ' ' + action +' namenode', capture=False)
     hadoop_daemons(action + ' secondarynamenode')#, hosts='masters')
 
 def datanode(action):
-    if env.hosts != parse_hosts('slaves'):
+    if TARGET != 'slaves':
         return
     hadoop_daemons(action + ' datanode')
 
